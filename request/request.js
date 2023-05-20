@@ -82,8 +82,14 @@ class Request {
         let data;
         switch (this.config.responseType) {
             case 'text':
-                data = await fetchResponse.text();
-
+                const acceptCharset = this.config.headers['Custom-Accept-Charset'];
+                if (acceptCharset) {
+                    console.log(`Decoding content from '${acceptCharset}' to 'utf-8'...`);
+                    const buffer = await fetchResponse.arrayBuffer();
+                    const decoder = new TextDecoder(acceptCharset);
+                    data = decoder.decode(buffer);
+                } else
+                    data = await fetchResponse.text();
                 break;
 
             case 'buffer':
